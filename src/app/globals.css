@@ -1,0 +1,336 @@
+@import "tailwindcss";
+
+:root {
+  --background: #EBEEF2;
+  --foreground: #0F172A;
+  --primary: #003B73;
+  --primary-foreground: #FFFFFF;
+  --secondary: #00A388;
+  --secondary-foreground: #FFFFFF;
+  --accent: #F1F5F9;
+  --radius: 14px;
+
+  /* Surface tokens */
+  --surface: #FFFFFF;
+  --surface-2: #F1F5F9;
+  --surface-3: #CBD5E1;
+  --border: #CBD5E1;
+  --muted: #64748B;
+  --sidebar-active-bg: color-mix(in srgb, var(--primary), transparent 92%);
+}
+
+/* Dark mode — applied when <html class="dark"> */
+.dark {
+  --background: #0D1117;
+  --foreground: #F1F5F9;
+  --primary: #3B82F6;
+  --primary-foreground: #FFFFFF;
+  --secondary: #00C9A7;
+  --secondary-foreground: #FFFFFF;
+  --accent: #1E293B;
+  --surface: #161B22;
+  --surface-2: #1E293B;
+  --surface-3: #273344;
+  --border: #30363D;
+  --muted: #94A3B8;
+  --sidebar-active-bg: color-mix(in srgb, var(--primary), transparent 85%);
+}
+
+@variant dark (&:where(.dark, .dark *));
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-accent: var(--accent);
+  --color-surface: var(--surface);
+  --color-surface-2: var(--surface-2);
+  --color-surface-3: var(--surface-3);
+  --color-border: var(--border);
+  --color-muted: var(--muted);
+
+  --radius-xl: var(--radius);
+  --radius-2xl: calc(var(--radius) + 4px);
+  --radius-lg: calc(var(--radius) - 2px);
+  --radius-md: calc(var(--radius) - 4px);
+  --radius-sm: calc(var(--radius) - 6px);
+
+  --shadow-premium: 0 10px 15px -3px rgba(0, 59, 115, 0.12), 0 4px 6px -2px rgba(0, 59, 115, 0.04);
+  --shadow-elevated: 0 20px 25px -5px rgba(0, 59, 115, 0.15), 0 10px 10px -5px rgba(0, 59, 115, 0.08);
+  --shadow-glass: 0 8px 32px 0 rgba(0, 59, 115, 0.12);
+
+  --font-sans: 'Outfit', 'Inter', ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif;
+
+  @keyframes shimmer {
+    0% { transform: translateX(-100%) skewX(-15deg); }
+    100% { transform: translateX(100%) skewX(-15deg); }
+  }
+}
+
+@utility bg-medical-pattern {
+  background-color: transparent;
+  background-image: radial-gradient(var(--primary) 0.5px, transparent 0.5px), radial-gradient(var(--primary) 0.5px, transparent 0.5px);
+  background-size: 24px 24px;
+  background-position: 0 0, 12px 12px;
+  opacity: 0.05;
+}
+
+@utility bg-medical-gradient {
+  background: radial-gradient(circle at 10% 20%, var(--primary-03, rgba(0, 59, 115, 0.03)) 0%, var(--background) 90%);
+}
+
+@utility no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+@utility custom-scrollbar {
+  scrollbar-width: thin;
+  scrollbar-color: var(--surface-3) transparent;
+
+  &::-webkit-scrollbar {
+    width: 6px;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background-color: var(--surface-3);
+    border-radius: 20px;
+    border: 2px solid transparent;
+  }
+
+  &:hover::-webkit-scrollbar-thumb {
+    background-color: var(--primary);
+  }
+}
+
+@utility bg-soft-light {
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.4) 0%, transparent 80%);
+}
+
+button,
+select,
+input[type="button"],
+input[type="submit"],
+input[type="reset"],
+input[type="checkbox"],
+input[type="radio"],
+[role="button"] {
+  cursor: pointer;
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  letter-spacing: -0.01em;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+/* ==========================================
+   GLOBAL DARK MODE ADAPTIVE OVERRIDES
+   These map common Tailwind hardcoded utility
+   classes → to CSS variable tokens when .dark
+   is active, so every card/page adapts.
+   ========================================== */
+
+/* Card and surface backgrounds */
+.dark .bg-white {
+  background-color: var(--surface) !important;
+}
+
+.dark .bg-slate-50 {
+  background-color: var(--surface-2) !important;
+}
+
+.dark .bg-slate-100 {
+  background-color: var(--surface-3) !important;
+}
+
+.dark .bg-slate-200 {
+  background-color: #2d3748 !important;
+}
+
+.dark .bg-\[\#F4F6FA\] {
+  background-color: var(--background) !important;
+}
+
+.dark .bg-gray-50 {
+  background-color: var(--surface-2) !important;
+}
+
+.dark .bg-gray-100 {
+  background-color: var(--surface-3) !important;
+}
+
+/* Text colors */
+.dark .text-slate-900 {
+  color: var(--foreground) !important;
+}
+
+.dark .text-slate-800 {
+  color: #e2e8f0 !important;
+}
+
+.dark .text-slate-700 {
+  color: #cbd5e1 !important;
+}
+
+.dark .text-slate-600 {
+  color: #94a3b8 !important;
+}
+
+.dark .text-slate-500 {
+  color: #64748b !important;
+}
+
+.dark .text-slate-400 {
+  color: #475569 !important;
+}
+
+.dark .text-gray-900 {
+  color: var(--foreground) !important;
+}
+
+.dark .text-gray-700 {
+  color: #cbd5e1 !important;
+}
+
+/* Borders */
+.dark .border-slate-100 {
+  border-color: var(--border) !important;
+}
+
+.dark .border-slate-200 {
+  border-color: var(--border) !important;
+}
+
+.dark .border-slate-200\/80 {
+  border-color: var(--border) !important;
+}
+
+.dark .border-slate-300 {
+  border-color: #374151 !important;
+}
+
+.dark .border-gray-200 {
+  border-color: var(--border) !important;
+}
+
+.dark .border-b {
+  border-color: var(--border);
+}
+
+/* Inputs */
+.dark input:not([type="checkbox"]):not([type="radio"]),
+.dark textarea,
+.dark select {
+  background-color: var(--surface-2) !important;
+  color: var(--foreground) !important;
+  border-color: var(--border) !important;
+}
+
+.dark input::placeholder,
+.dark textarea::placeholder {
+  color: var(--muted) !important;
+}
+
+/* Auth page outer wrapper */
+.dark .min-h-screen {
+  background-color: var(--background);
+}
+
+/* Shadow softening in dark mode */
+.dark .shadow-xl {
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.4) !important;
+}
+
+.dark .shadow-lg {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3) !important;
+}
+
+.dark .shadow-sm {
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.2) !important;
+}
+
+/* Dividers */
+.dark .divide-slate-100> :not([hidden])~ :not([hidden]) {
+  border-color: var(--border);
+}
+
+/* Hover surfaces */
+.dark .hover\:bg-slate-50:hover {
+  background-color: var(--surface-2) !important;
+}
+
+.dark .hover\:bg-slate-100:hover {
+  background-color: var(--surface-3) !important;
+}
+
+/* Alert/info/error blocks in dark mode */
+.dark .bg-amber-50 {
+  background-color: rgba(245, 158, 11, 0.1) !important;
+  border-color: rgba(245, 158, 11, 0.2) !important;
+  color: #fbbf24 !important;
+}
+
+.dark .bg-rose-50 {
+  background-color: rgba(244, 63, 94, 0.1) !important;
+  border-color: rgba(244, 63, 94, 0.2) !important;
+  color: #fb7185 !important;
+}
+
+.dark .bg-emerald-50 {
+  background-color: rgba(16, 185, 129, 0.1) !important;
+  border-color: rgba(16, 185, 129, 0.2) !important;
+  color: #34d399 !important;
+}
+
+.dark .bg-blue-50,
+.dark .bg-primary-50,
+.dark .bg-indigo-50 {
+  background-color: color-mix(in srgb, var(--primary), transparent 90%) !important;
+  border-color: color-mix(in srgb, var(--primary), transparent 80%) !important;
+  color: var(--primary) !important;
+}
+
+/* Custom scrollbar in dark mode */
+.dark * {
+  scrollbar-color: var(--surface-3) var(--surface-2);
+}
+
+/* 
+   React Hot Toast Dark Mode Sync
+   Ensures the default toast() calls feel native to the theme 
+*/
+.dark .react-hot-toast {
+  background: var(--surface) !important;
+  color: var(--foreground) !important;
+  border: 1px solid var(--border) !important;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5) !important;
+}
+
+.react-hot-toast {
+  border-radius: 12px !important;
+  font-weight: 600 !important;
+  font-size: 14px !important;
+  padding: 12px 20px !important;
+  border: 1px solid var(--border) !important;
+}
+
+/* Custom scrollbar in dark mode */
+.dark * {
+  scrollbar-color: var(--surface-3) var(--surface-2);
+}
