@@ -34,12 +34,17 @@ export function PatientScanReceiver() {
     connectionStartedRef.current = true;
 
     const isBrowser = typeof window !== 'undefined';
-    // WebSockets proxying through Next.js dev server rewrites is highly unreliable.
-    // Instead of using a relative path ('/hubs/scanner'), we detect the current hostname 
-    // and connect DIRECTLY to the ASP.NET backend on port 5004. CORS is already enabled.
-    const socketBase = isBrowser
+    const isLocalHost = isBrowser && (
+      window.location.hostname === 'localhost' ||
+      window.location.hostname === '127.0.0.1' ||
+      window.location.hostname.startsWith('192.168.') ||
+      window.location.hostname.startsWith('10.') ||
+      window.location.hostname.startsWith('172.')
+    );
+
+    const socketBase = isLocalHost
       ? `http://${window.location.hostname}:5004`
-      : (process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5004/api').replace(/\/api$/, '');
+      : (process.env.NEXT_PUBLIC_API_URL || 'https://sajilobackend-0r8o.onrender.com/api').replace(/\/api$/, '');
 
     const hubConnection = new signalR.HubConnectionBuilder()
       .withUrl(`${socketBase}/hubs/scanner`, {
@@ -112,9 +117,17 @@ export function PatientScanReceiver() {
     setIsVerifying(true);
     try {
       const isBrowser = typeof window !== 'undefined';
-      const apiBase = isBrowser
+      const isLocalHost = isBrowser && (
+        window.location.hostname === 'localhost' ||
+        window.location.hostname === '127.0.0.1' ||
+        window.location.hostname.startsWith('192.168.') ||
+        window.location.hostname.startsWith('10.') ||
+        window.location.hostname.startsWith('172.')
+      );
+
+      const apiBase = isLocalHost
         ? '/api'
-        : (process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5004/api');
+        : (process.env.NEXT_PUBLIC_API_URL || 'https://sajilobackend-0r8o.onrender.com/api');
 
       const res = await fetch(`${apiBase}/scanner/verify-totp`, {
         method: 'POST',

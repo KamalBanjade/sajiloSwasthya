@@ -34,8 +34,17 @@ export default function PairPage({ params }: { params: Promise<{ sessionId: stri
     try {
       const { deviceName, mobileDeviceId } = getDeviceInfo();
       const isBrowser = typeof window !== 'undefined';
-      const apiHost = isBrowser ? `${window.location.hostname}:5004` : 'localhost:5004';
-      const apiBase = `http://${apiHost}/api`;
+      const isLocalHost = isBrowser && (
+        window.location.hostname === 'localhost' ||
+        window.location.hostname === '127.0.0.1' ||
+        window.location.hostname.startsWith('192.168.') ||
+        window.location.hostname.startsWith('10.') ||
+        window.location.hostname.startsWith('172.')
+      );
+
+      const apiBase = isLocalHost
+        ? `http://${window.location.hostname}:5004/api`
+        : (process.env.NEXT_PUBLIC_API_URL || 'https://sajilobackend-0r8o.onrender.com/api');
       
       const res = await fetch(`${apiBase}/scanner/pair`, {
         method: 'POST',

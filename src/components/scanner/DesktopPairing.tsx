@@ -35,11 +35,17 @@ export function DesktopPairing() {
     setSessionId(newSessionId);
 
     const isBrowser = typeof window !== 'undefined';
-    // WebSockets proxying through Next.js dev server rewrites is highly unreliable.
-    // Connect DIRECTLY to the ASP.NET backend on port 5004 to avoid routing/CORS/negotiation issues.
-    const baseUrl = isBrowser ?
-    `http://${window.location.hostname}:5004` :
-    (process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5004/api').replace(/\/api$/, '');
+    const isLocalHost = isBrowser && (
+      window.location.hostname === 'localhost' ||
+      window.location.hostname === '127.0.0.1' ||
+      window.location.hostname.startsWith('192.168.') ||
+      window.location.hostname.startsWith('10.') ||
+      window.location.hostname.startsWith('172.')
+    );
+
+    const baseUrl = isLocalHost
+      ? `http://${window.location.hostname}:5004`
+      : (process.env.NEXT_PUBLIC_API_URL || 'https://sajilobackend-0r8o.onrender.com/api').replace(/\/api$/, '');
 
     const hubConnection = new signalR.HubConnectionBuilder().
     withUrl(`${baseUrl}/hubs/scanner`, {
