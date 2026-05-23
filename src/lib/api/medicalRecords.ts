@@ -232,8 +232,17 @@ export const medicalRecordsApi = {
             });
 
             if (!response.ok) {
-                if (response.status === 403) throw new Error('Access denied');
-                throw new Error(`HTTP ${response.status}`);
+                let errorMessage = `HTTP ${response.status}`;
+                try {
+                    const errorData = await response.json();
+                    if (errorData && errorData.message) {
+                        errorMessage = errorData.message;
+                    }
+                } catch (e) {
+                    // Ignore JSON parsing errors
+                }
+                if (response.status === 403) throw new Error('Access denied: ' + errorMessage);
+                throw new Error(errorMessage);
             }
 
             const blob = await response.blob();
@@ -321,8 +330,17 @@ export const medicalRecordsApi = {
             });
 
             if (!response.ok) {
-                if (response.status === 403) throw new Error('Access denied');
-                throw new Error(`HTTP ${response.status}`);
+                let errorMessage = `HTTP ${response.status}`;
+                try {
+                    const errorData = await response.json();
+                    if (errorData && errorData.message) {
+                        errorMessage = errorData.message;
+                    }
+                } catch (e) {
+                    // Ignore JSON parsing errors
+                }
+                if (response.status === 403) throw new Error('Access denied: ' + errorMessage);
+                throw new Error(errorMessage);
             }
 
             const blob = await response.blob();
