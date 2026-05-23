@@ -1,5 +1,45 @@
 import api from '../utils/axios';
 import toast from 'react-hot-toast';
+import Cookies from 'js-cookie';
+
+const getFetchBaseAndHeaders = () => {
+    const isBrowser = typeof window !== 'undefined';
+    const isLocalHost = isBrowser && (
+        window.location.hostname === 'localhost' ||
+        window.location.hostname === '127.0.0.1' ||
+        window.location.hostname.startsWith('192.168.') ||
+        window.location.hostname.startsWith('10.') ||
+        window.location.hostname.startsWith('172.')
+    );
+
+    const apiBase = isLocalHost
+        ? '/api'
+        : (process.env.NEXT_PUBLIC_API_URL || 'https://sajilobackend-0r8o.onrender.com/api');
+
+    const headers: Record<string, string> = {
+        'Content-Type': 'application/json',
+    };
+
+    let token = Cookies.get('auth_token');
+    if (!token && isBrowser) {
+        try {
+            const rawStorage = localStorage.getItem('auth-storage');
+            if (rawStorage) {
+                const parsed = JSON.parse(rawStorage);
+                token = parsed.state?.token || parsed.state?.Token;
+            }
+        } catch (e) {
+            console.error("Failed to parse auth token from localStorage", e);
+        }
+    }
+
+    if (token) {
+        headers['Authorization'] = `Bearer ${token}`;
+    }
+
+    return { apiBase, headers };
+};
+
 
 export interface UploadMedicalRecordDTO {
     file: File;
@@ -183,9 +223,10 @@ export const medicalRecordsApi = {
      */
     downloadRecordForDoctor: async (id: string, signal?: AbortSignal): Promise<void> => {
         try {
-            const baseUrl = '/api';
+            const { apiBase, headers } = getFetchBaseAndHeaders();
 
-            const response = await fetch(`${baseUrl}/doctor/records/${id}/stream-download`, {
+            const response = await fetch(`${apiBase}/doctor/records/${id}/stream-download`, {
+                headers,
                 credentials: 'include', // cookie-based auth (same as Axios withCredentials)
                 signal,
             });
@@ -229,9 +270,10 @@ export const medicalRecordsApi = {
         if (cached) return cached;
 
         try {
-            const baseUrl = '/api';
+            const { apiBase, headers } = getFetchBaseAndHeaders();
 
-            const response = await fetch(`${baseUrl}/doctor/records/${id}/view`, {
+            const response = await fetch(`${apiBase}/doctor/records/${id}/view`, {
+                headers,
                 credentials: 'include',
                 signal,
             });
@@ -270,9 +312,10 @@ export const medicalRecordsApi = {
         if (cached) return cached;
 
         try {
-            const baseUrl = '/api';
+            const { apiBase, headers } = getFetchBaseAndHeaders();
 
-            const response = await fetch(`${baseUrl}/medical-records/view/${id}`, {
+            const response = await fetch(`${apiBase}/medical-records/view/${id}`, {
+                headers,
                 credentials: 'include',
                 signal,
             });
