@@ -196,9 +196,9 @@ export const DashboardLayout = ({ children, role }: { children: React.ReactNode;
         { icon: UsersIcon, label: 'Patient Directory', desc: 'Global directory of registered patients', href: '/admin/patients', section: 'Management' },
         { icon: ClipboardDocumentListIcon, label: 'Audit Logs', desc: 'Immutable records of all system activities', href: '/admin/audit-logs', section: 'System' },
         { icon: ChartBarIcon, label: 'System Stats', desc: 'Real-time infrastructure and usage metrics', href: '/admin/statistics', section: 'System' },
-        // { icon: CircleStackIcon, label: 'Backups', desc: 'Manage system backups and recovery points', href: '/admin/backups', section: 'System' },
-        // { icon: LockClosedIcon, label: 'Security', desc: 'Global threat monitoring and policy control', href: '/admin/security', section: 'System' }
-        ];
+        { icon: CircleStackIcon, label: 'Backups', desc: 'Manage system backups and recovery points', href: '/admin/backups', section: 'System' },
+        { icon: LockClosedIcon, label: 'Security', desc: 'Global threat monitoring and policy control', href: '/admin/security', section: 'System' }
+    ];
 
 
     const items = role === 'Admin' ? adminItems : role === 'Doctor' ? doctorItems : patientItems;
@@ -430,9 +430,9 @@ const UserPopover = ({ user, role, logout }: { user: any; role: string; logout: 
 
                 {/* Avatar + Name — inline flex, no absolute overlap */}
                 <div className="flex items-center gap-3 px-4 pt-4 pb-3">
-                    <Avatar 
-                        src={user?.profilePictureUrl} 
-                        gender={user?.gender} 
+                    <Avatar
+                        src={user?.profilePictureUrl}
+                        gender={user?.gender}
                         name={`${user?.firstName} ${user?.lastName}`}
                         className="w-11 h-11 rounded-xl"
                     />
@@ -520,9 +520,9 @@ const UserPopover = ({ user, role, logout }: { user: any; role: string; logout: 
                     </div>
                 </div>
 
-                <Avatar 
-                    src={user?.profilePictureUrl} 
-                    gender={user?.gender} 
+                <Avatar
+                    src={user?.profilePictureUrl}
+                    gender={user?.gender}
                     name={`${user?.firstName} ${user?.lastName}`}
                     className={`
                         w-10 h-10 rounded-2xl
