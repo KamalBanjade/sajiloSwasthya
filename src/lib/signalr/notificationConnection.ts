@@ -38,7 +38,18 @@ class NotificationConnectionManager {
     }
 
     this.isConnecting = true;
-    const token = Cookies.get(TOKEN_KEY);
+    let token = Cookies.get(TOKEN_KEY);
+    if (!token && typeof window !== 'undefined') {
+      try {
+        const rawStorage = localStorage.getItem('auth-storage');
+        if (rawStorage) {
+          const parsed = JSON.parse(rawStorage);
+          token = parsed.state?.token || parsed.state?.Token;
+        }
+      } catch (e) {
+        console.error("Failed to parse auth token from localStorage", e);
+      }
+    }
 
     try {
       const isBrowser = typeof window !== 'undefined';

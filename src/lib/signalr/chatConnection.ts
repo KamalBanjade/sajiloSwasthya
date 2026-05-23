@@ -38,7 +38,18 @@ class ChatConnectionManager {
     }
 
     this.isConnecting = true;
-    const token = Cookies.get('auth_token');
+    let token = Cookies.get('auth_token');
+    if (!token && typeof window !== 'undefined') {
+      try {
+        const rawStorage = localStorage.getItem('auth-storage');
+        if (rawStorage) {
+          const parsed = JSON.parse(rawStorage);
+          token = parsed.state?.token || parsed.state?.Token;
+        }
+      } catch (e) {
+        console.error("Failed to parse auth token from localStorage", e);
+      }
+    }
 
     try {
       const isBrowser = typeof window !== 'undefined';
