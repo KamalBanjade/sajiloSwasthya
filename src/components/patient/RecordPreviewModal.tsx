@@ -26,7 +26,7 @@ export const RecordPreviewModal: React.FC<RecordPreviewModalProps> = ({ record, 
                     responseType: 'blob'
                 });
 
-                const blob = new Blob([response.data], { type: response.headers['content-type'] });
+                const blob = new Blob([response.data], { type: response.headers['content-type'] as string || undefined });
                 const url = URL.createObjectURL(blob);
                 setBlobUrl(url);
             } catch (err: any) {
