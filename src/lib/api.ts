@@ -28,7 +28,10 @@ export interface UserOverview {
     phoneNumber?: string;
 }
 
+
+
 export interface Doctor {
+    id?: string;
     userId: string;
     firstName: string;
     lastName: string;
