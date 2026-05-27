@@ -32,6 +32,7 @@ import { Button } from '@/components/ui/Button';
 import { H1, H2, H3, Text } from '@/components/ui/Typography';
 import { ResponsiveTable } from '@/components/data-display/ResponsiveTable';
 import { Card } from '@/components/ui/Card';
+import { Input } from '@/components/ui/Input';
 import { Skeleton } from '@/components/ui/Skeleton';
 
 
@@ -379,79 +380,88 @@ export default function AdminUsersPage() {
             {/* Edit Modal (Standardized) */}
             <AnimatePresence>
                 {showEditModal && (
-                    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm">
+                    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/10 dark:bg-slate-950/20 backdrop-blur-md">
                         <motion.div
                             initial={{ opacity: 0, scale: 0.95, y: 20 }}
                             animate={{ opacity: 1, scale: 1, y: 0 }}
                             exit={{ opacity: 0, scale: 0.95, y: 20 }}
-                            className="bg-white rounded-3xl shadow-2xl w-full max-w-lg overflow-hidden border border-white"
+                            className="bg-white dark:bg-slate-900 rounded-[2.5rem] shadow-2xl w-full max-w-lg overflow-hidden border border-slate-100 dark:border-slate-800 relative"
                         >
-                            <div className="p-8 border-b border-gray-50 bg-gradient-to-r from-blue-50/30 to-transparent">
-                                <h2 className="text-2xl font-light text-gray-900 tracking-tight">Update User Profile</h2>
-                                <p className="text-gray-500 mt-1 text-sm font-light">Manage account details for {editingUser?.email}</p>
+                            {/* Decorative Blurs */}
+                            <div className="absolute top-0 right-0 w-32 h-32 bg-blue-500/5 rounded-full blur-3xl -mr-16 -mt-16 pointer-events-none" />
+                            <div className="absolute bottom-0 left-0 w-32 h-32 bg-emerald-500/5 rounded-full blur-3xl -ml-16 -mb-16 pointer-events-none" />
+
+                            <div className="p-8 border-b border-slate-100 dark:border-slate-800/80 bg-gradient-to-r from-blue-50/30 to-transparent dark:from-blue-950/10 relative z-10 flex items-center justify-between">
+                                <div>
+                                    <span className="px-3 py-1 bg-blue-600 text-white text-[10px] font-black uppercase tracking-widest rounded-lg">User Registry</span>
+                                    <h2 className="text-2xl font-black text-slate-900 dark:text-white tracking-tight mt-2.5">Update User Profile</h2>
+                                    <p className="text-slate-500 dark:text-slate-400 mt-1 text-sm font-medium">Manage details for {editingUser?.email}</p>
+                                </div>
+                                <button
+                                    type="button"
+                                    onClick={() => setShowEditModal(false)}
+                                    className="w-10 h-10 flex items-center justify-center rounded-2xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-400 hover:text-slate-650 dark:hover:text-slate-200 transition-all"
+                                >
+                                    <X className="w-5 h-5" />
+                                </button>
                             </div>
 
-                            <form onSubmit={handleUpdateUser} className="p-8 space-y-6">
+                            <form onSubmit={handleUpdateUser} className="p-8 space-y-6 relative z-10">
                                 <div className="grid grid-cols-2 gap-4">
-                                    <div className="space-y-2">
-                                        <label className="text-xs font-semibold text-gray-400 uppercase tracking-wider ml-1">First Name</label>
-                                        <input
-                                            type="text"
-                                            required
-                                            value={form.firstName}
-                                            onChange={(e) => setForm({ ...form, firstName: e.target.value })}
-                                            className="w-full px-4 py-3 bg-gray-50/50 border border-gray-100 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500/50 transition-all font-light"
-                                        />
-                                    </div>
-                                    <div className="space-y-2">
-                                        <label className="text-xs font-semibold text-gray-400 uppercase tracking-wider ml-1">Last Name</label>
-                                        <input
-                                            type="text"
-                                            required
-                                            value={form.lastName}
-                                            onChange={(e) => setForm({ ...form, lastName: e.target.value })}
-                                            className="w-full px-4 py-3 bg-gray-50/50 border border-gray-100 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500/50 transition-all font-light"
-                                        />
-                                    </div>
-                                </div>
-
-                                <div className="space-y-2">
-                                    <label className="text-xs font-semibold text-gray-400 uppercase tracking-wider ml-1">Phone Number</label>
-                                    <input
+                                    <Input
+                                        label="First Name"
                                         type="text"
-                                        value={form.phoneNumber}
-                                        onChange={(e) => setForm({ ...form, phoneNumber: e.target.value })}
-                                        className="w-full px-4 py-3 bg-gray-50/50 border border-gray-100 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500/50 transition-all font-light"
-                                        placeholder="+977 1234567890"
+                                        required
+                                        value={form.firstName}
+                                        onChange={(e) => setForm({ ...form, firstName: e.target.value })}
+                                        className="h-12 rounded-2xl border-slate-200 dark:border-slate-700 focus:ring-blue-500/10"
+                                    />
+                                    <Input
+                                        label="Last Name"
+                                        type="text"
+                                        required
+                                        value={form.lastName}
+                                        onChange={(e) => setForm({ ...form, lastName: e.target.value })}
+                                        className="h-12 rounded-2xl border-slate-200 dark:border-slate-700 focus:ring-blue-500/10"
                                     />
                                 </div>
 
-                                <div className="flex items-center justify-between p-4 bg-gray-50/50 rounded-2xl border border-gray-100">
+                                <Input
+                                    label="Phone Number"
+                                    type="text"
+                                    value={form.phoneNumber}
+                                    onChange={(e) => setForm({ ...form, phoneNumber: e.target.value })}
+                                    placeholder="+977 1234567890"
+                                    className="h-12 rounded-2xl border-slate-200 dark:border-slate-700 focus:ring-blue-500/10"
+                                />
+
+                                <div className="flex items-center justify-between p-4 bg-slate-50/50 dark:bg-slate-850 rounded-2xl border border-slate-100 dark:border-slate-800">
                                     <div className="flex flex-col">
-                                        <span className="text-sm font-medium text-gray-900">Account Active</span>
-                                        <span className="text-xs text-gray-500 font-light italic">Allow user to log in</span>
+                                        <span className="text-sm font-medium text-slate-900 dark:text-white">Account Active</span>
+                                        <span className="text-xs text-slate-500 dark:text-slate-400 font-medium">Allow user to log in</span>
                                     </div>
                                     <button
                                         type="button"
                                         onClick={() => setForm({ ...form, isActive: !form.isActive })}
-                                        className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors duration-300 focus:outline-none ${form.isActive ? 'bg-blue-600' : 'bg-gray-200'}`}
+                                        className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors duration-300 focus:outline-none ${form.isActive ? 'bg-blue-600' : 'bg-gray-200 dark:bg-slate-750'}`}
                                     >
                                         <span className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform duration-300 ${form.isActive ? 'translate-x-6' : 'translate-x-1'}`} />
                                     </button>
                                 </div>
 
                                 <div className="flex items-center gap-4 pt-4">
-                                    <button
+                                    <Button
                                         type="button"
+                                        variant="ghost"
                                         onClick={() => setShowEditModal(false)}
-                                        className="flex-1 px-6 py-3 border border-gray-200 text-gray-600 rounded-xl hover:bg-gray-50 transition-all font-medium"
+                                        className="flex-1 h-12 rounded-2xl text-[10px] font-black uppercase tracking-widest text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 bg-transparent hover:bg-transparent border-none"
                                     >
                                         Cancel
-                                    </button>
-                                    <button
+                                    </Button>
+                                    <Button
                                         type="submit"
                                         disabled={isSaving}
-                                        className="flex-1 px-6 py-3 bg-blue-600 text-white rounded-xl hover:bg-blue-700 disabled:opacity-50 transition-all shadow-lg shadow-blue-500/20 font-medium flex items-center justify-center"
+                                        className="flex-1 h-12 bg-blue-600 text-white rounded-2xl font-black text-[10px] uppercase tracking-widest shadow-lg shadow-blue-500/20 hover:bg-blue-700 disabled:opacity-50 transition-all flex items-center justify-center"
                                     >
                                         {isSaving ? (
                                             <>
@@ -461,7 +471,7 @@ export default function AdminUsersPage() {
                                         ) : (
                                             'Update User'
                                         )}
-                                    </button>
+                                    </Button>
                                 </div>
                             </form>
                         </motion.div>
