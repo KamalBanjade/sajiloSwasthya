@@ -78,7 +78,7 @@ export default function BookAppointmentPage() {
     const [selectedDoctorId, setSelectedDoctorId] = useState<string>('');
     const [appointmentDate, setAppointmentDate] = useState<string>(format(addDays(new Date(), 1), 'yyyy-MM-dd'));
     const [appointmentTime, setAppointmentTime] = useState<string>('');
-    const [reasonForVisit, setReasonForVisit] = useState<string>('');
+    const [reasonForVisit, setReasonForVisit] = useState<string>('Follow Up');
     const [duration, setDuration] = useState<number>(30);
     const [department, setDepartment] = useState<string>('');
 
@@ -376,7 +376,7 @@ export default function BookAppointmentPage() {
 
                             {/* Reason */}
                             <div className="space-y-3 pt-4 border-t border-slate-100 dark:border-slate-800">
-                                <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1 mb-3 block">2. Reason for Clinical Review</label>
+                                <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1 mb-3 block">2. Reason for Clinical Review <span className="text-rose-500 font-black ml-0.5">*</span></label>
                                 <textarea
                                     value={reasonForVisit}
                                     onChange={(e) => setReasonForVisit(e.target.value)}

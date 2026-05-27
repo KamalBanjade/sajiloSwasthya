@@ -44,6 +44,20 @@ export default function AdminDepartmentsPage() {
         fetchDepartments();
     }, []);
 
+    useEffect(() => {
+        const handleKeyDown = (e: KeyboardEvent) => {
+            if (e.key === 'Escape') {
+                setShowModal(false);
+            }
+        };
+        if (showModal) {
+            window.addEventListener('keydown', handleKeyDown, true);
+        }
+        return () => {
+            window.removeEventListener('keydown', handleKeyDown, true);
+        };
+    }, [showModal]);
+
     const fetchDepartments = async () => {
         try {
             setLoading(true);
@@ -279,53 +293,53 @@ export default function AdminDepartmentsPage() {
             {/* Modal */}
             <AnimatePresence>
                 {showModal && (
-                    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 bg-black/40 backdrop-blur-sm">
+                    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 bg-slate-900/60 dark:bg-slate-950/80 backdrop-blur-sm">
                         <motion.div
                             initial={{ opacity: 0, scale: 0.95, y: 20 }}
                             animate={{ opacity: 1, scale: 1, y: 0 }}
                             exit={{ opacity: 0, scale: 0.95, y: 20 }}
-                            className="bg-white rounded-3xl shadow-2xl w-full max-w-lg overflow-hidden border border-white"
+                            className="bg-white dark:bg-slate-900 rounded-3xl shadow-2xl w-full max-w-lg overflow-hidden border border-white dark:border-slate-800"
                         >
-                            <div className="p-8 border-b border-gray-50 bg-gradient-to-r from-blue-50/30 to-transparent">
-                                <h2 className="text-2xl font-light text-gray-900 tracking-tight">
+                            <div className="p-8 border-b border-gray-50 dark:border-slate-800 bg-gradient-to-r from-blue-50/30 to-transparent dark:from-blue-950/10">
+                                <h2 className="text-2xl font-light text-gray-900 dark:text-white tracking-tight">
                                     {editingDept ? 'Edit Unit' : 'Create New Unit'}
                                 </h2>
-                                <p className="text-gray-500 mt-1 text-sm font-light">Enter department information</p>
+                                <p className="text-gray-500 dark:text-slate-400 mt-1 text-sm font-light">Enter department information</p>
                             </div>
 
                             <form onSubmit={handleSubmit} className="p-8 space-y-6">
                                 <div className="space-y-2">
-                                    <label className="text-sm font-medium text-gray-700 ml-1">Name</label>
+                                    <label className="text-sm font-medium text-gray-700 dark:text-slate-300 ml-1">Name</label>
                                     <input
                                         type="text"
                                         required
                                         value={form.name}
                                         onChange={(e) => setForm({ ...form, name: e.target.value })}
-                                        className="w-full px-4 py-3 bg-gray-50/50 border border-gray-100 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500/50 transition-all font-light"
+                                        className="w-full px-4 py-3 bg-gray-50/50 dark:bg-slate-800 border border-gray-100 dark:border-slate-800 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500/50 transition-all font-light dark:text-white"
                                         placeholder="e.g. Cardiology"
                                     />
                                 </div>
 
                                 <div className="space-y-2">
-                                    <label className="text-sm font-medium text-gray-700 ml-1">Description</label>
+                                    <label className="text-sm font-medium text-gray-700 dark:text-slate-300 ml-1">Description</label>
                                     <textarea
                                         rows={3}
                                         value={form.description}
                                         onChange={(e) => setForm({ ...form, description: e.target.value })}
-                                        className="w-full px-4 py-3 bg-gray-50/50 border border-gray-100 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500/50 transition-all font-light resize-none"
+                                        className="w-full px-4 py-3 bg-gray-50/50 dark:bg-slate-800 border border-gray-100 dark:border-slate-800 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500/50 transition-all font-light resize-none dark:text-white"
                                         placeholder="Briefly describe the unit's clinical focus..."
                                     />
                                 </div>
 
-                                <div className="flex items-center justify-between p-4 bg-gray-50/50 rounded-2xl border border-gray-100">
+                                <div className="flex items-center justify-between p-4 bg-gray-50/50 dark:bg-slate-800 rounded-2xl border border-gray-100 dark:border-slate-800">
                                     <div className="flex flex-col">
-                                        <span className="text-sm font-medium text-gray-900">Visibility Status</span>
-                                        <span className="text-xs text-gray-500 font-light">Allow this unit to appear in dropdowns</span>
+                                        <span className="text-sm font-medium text-gray-900 dark:text-white">Visibility Status</span>
+                                        <span className="text-xs text-gray-500 dark:text-slate-400 font-light">Allow this unit to appear in dropdowns</span>
                                     </div>
                                     <button
                                         type="button"
                                         onClick={() => setForm({ ...form, isActive: !form.isActive })}
-                                        className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors duration-300 focus:outline-none ${form.isActive ? 'bg-blue-600' : 'bg-gray-200'}`}
+                                        className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors duration-300 focus:outline-none ${form.isActive ? 'bg-blue-600' : 'bg-gray-200 dark:bg-slate-700'}`}
                                     >
                                         <span className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform duration-300 ${form.isActive ? 'translate-x-6' : 'translate-x-1'}`} />
                                     </button>
@@ -335,7 +349,7 @@ export default function AdminDepartmentsPage() {
                                     <button
                                         type="button"
                                         onClick={() => setShowModal(false)}
-                                        className="flex-1 px-6 py-3 border border-gray-200 text-gray-600 rounded-xl hover:bg-gray-50 transition-all font-medium"
+                                        className="flex-1 px-6 py-3 border border-gray-200 dark:border-slate-700 text-gray-600 dark:text-slate-300 rounded-xl hover:bg-gray-50 dark:hover:bg-slate-800 bg-transparent hover:bg-transparent border-none transition-all font-medium"
                                     >
                                         Cancel
                                     </button>

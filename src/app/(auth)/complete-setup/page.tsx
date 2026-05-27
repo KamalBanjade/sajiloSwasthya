@@ -104,7 +104,7 @@ export default function CompleteSetupPage() {
     const canComplete = totpScanned && verificationCode.length === 6;
 
     return (
-        <div className="min-h-[85vh] flex flex-col items-center justify-center py-10 px-4">
+        <div className="flex flex-col items-center justify-center py-4 px-4 w-full">
             <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}

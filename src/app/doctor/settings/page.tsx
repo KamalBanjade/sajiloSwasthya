@@ -371,53 +371,7 @@ export default function DoctorSettingsPage() {
                         </div>
                     </SettingsSection>
 
-                    {/* Interface Preferences */}
-                    <SettingsSection
-                        icon={<Palette size={24} />}
-                        title="Interface"
-                        desc="UI Styling & Notifications"
-                        accent="emerald"
-                    >
-                        <div className="space-y-6">
-                            <div className="space-y-3">
-                                <label className="text-[9px] font-black text-slate-400 uppercase tracking-widest px-1">Visual Theme</label>
-                                <div className="grid grid-cols-3 gap-2 p-1.5 bg-slate-100 dark:bg-slate-800/50 rounded-2xl">
-                                    <button className="flex flex-col items-center justify-center gap-2 py-3 rounded-xl bg-white dark:bg-slate-900 shadow-sm text-slate-900 dark:text-white">
-                                        <Sun size={16} />
-                                        <span className="text-[9px] font-black uppercase">Light</span>
-                                    </button>
-                                    <button className="flex flex-col items-center justify-center gap-2 py-3 rounded-xl text-slate-400 hover:text-slate-600 dark:hover:text-white transition-all">
-                                        <Moon size={16} />
-                                        <span className="text-[9px] font-black uppercase">Dark</span>
-                                    </button>
-                                    <button className="flex flex-col items-center justify-center gap-2 py-3 rounded-xl text-slate-400 hover:text-slate-600 dark:hover:text-white transition-all">
-                                        <Monitor size={16} />
-                                        <span className="text-[9px] font-black uppercase">System</span>
-                                    </button>
-                                </div>
-                            </div>
 
-                            <div className="space-y-3 pt-2">
-                                <label className="text-[9px] font-black text-slate-400 uppercase tracking-widest px-1">Clinical Notifications</label>
-                                <div className="space-y-3">
-                                    {[
-                                        { icon: <Mail size={14} />, label: 'Email Alerts' },
-                                        { icon: <Bell size={14} />, label: 'Push Notifications' }
-                                    ].map((pref, i) => (
-                                        <div key={i} className="flex items-center justify-between p-4 bg-white dark:bg-slate-900 border border-slate-100 dark:border-white/5 rounded-2xl">
-                                            <div className="flex items-center gap-3">
-                                                <div className="text-emerald-500">{pref.icon}</div>
-                                                <span className="text-[10px] font-black text-slate-700 dark:text-slate-300 uppercase tracking-widest">{pref.label}</span>
-                                            </div>
-                                            <div className="w-10 h-6 bg-emerald-500 rounded-full relative">
-                                                <div className="absolute top-1 left-5 w-4 h-4 bg-white rounded-full shadow-sm" />
-                                            </div>
-                                        </div>
-                                    ))}
-                                </div>
-                            </div>
-                        </div>
-                    </SettingsSection>
                 </div>
             </div>
 

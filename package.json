@@ -27,7 +27,7 @@
     "jwt-decode": "^4.0.0",
     "lodash": "^4.17.23",
     "lucide-react": "^0.575.0",
-    "next": "16.1.6",
+    "next": "^16.2.6",
     "pdfjs-dist": "^5.5.207",
     "qr-scanner": "^1.4.2",
     "qrcode.react": "^4.2.0",

@@ -235,26 +235,28 @@ export const DashboardLayout = ({ children, role }: { children: React.ReactNode;
 
                 {/* Logo Area */}
                 <div className={`flex items-center shrink-0 transition-all duration-500 ease-[cubic-bezier(0.4,0,0.2,1)] border-b border-[var(--border)] h-20 ${isCollapsed ? 'justify-center px-0' : 'px-3 gap-0'}`}>
-                    {isCollapsed ?
-                        <img src="/images/logo.webp" alt="Logo" className="h-9 w-9 object-contain transition-all duration-500" /> :
+                    <Link href={role === 'Admin' ? '/admin/dashboard' : role === 'Doctor' ? '/doctor/dashboard' : '/dashboard'} className="flex items-center">
+                        {isCollapsed ?
+                            <img src="/images/logo.webp" alt="Logo" className="h-9 w-9 object-contain transition-all duration-500 hover:scale-105" /> :
 
-                        <div className="flex items-center animate-in fade-in slide-in-from-left-4 duration-500">
-                            <div className="p-1 rounded-2xl shrink-0">
-                                <img src="/images/logo.webp" alt="Logo" className="h-11 w-auto object-contain drop-shadow-sm" />
-                            </div>
-                            <div className="flex flex-col items-center -mt-2">
-                                <div className="relative w-fit mx-auto overflow-visible">
-                                    <img src="/images/sajilo.webp" alt="सजिलो" className="h-14 w-36 object-contain translate-x-[-18px]" />
-                                    <span
-                                        className="absolute text-[16px] font-semibold text-secondary tracking-[0.05em] font-amita inline-block scale-x-110"
-                                        style={{ bottom: '4px', right: '14px' }}>
+                            <div className="flex items-center animate-in fade-in slide-in-from-left-4 duration-500 cursor-pointer group/logo">
+                                <div className="p-1 rounded-2xl shrink-0">
+                                    <img src="/images/logo.webp" alt="Logo" className="h-11 w-auto object-contain drop-shadow-sm group-hover/logo:scale-105 transition-transform" />
+                                </div>
+                                <div className="flex flex-col items-center -mt-2">
+                                    <div className="relative w-fit mx-auto overflow-visible">
+                                        <img src="/images/sajilo.webp" alt="सजिलो" className="h-14 w-36 object-contain translate-x-[-18px]" />
+                                        <span
+                                            className="absolute text-[16px] font-semibold text-secondary tracking-[0.05em] font-amita inline-block scale-x-110"
+                                            style={{ bottom: '4px', right: '14px' }}>
 
-                                        स्वास्थ्य
-                                    </span>
+                                            स्वास्थ्य
+                                        </span>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-                    }
+                        }
+                    </Link>
                 </div>
 
                 {/* Navigation */}
