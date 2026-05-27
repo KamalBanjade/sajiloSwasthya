@@ -1,5 +1,6 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { CheckCircleIcon } from '@heroicons/react/24/solid';
+import { EyeIcon, EyeSlashIcon } from '@heroicons/react/24/outline';
 
 interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
     label?: string;
@@ -8,7 +9,11 @@ interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
 }
 
 export const Input = React.forwardRef<HTMLInputElement, InputProps>(
-    ({ label, error, success, className = '', ...props }, ref) => {
+    ({ label, error, success, className = '', type, ...props }, ref) => {
+        const [showPassword, setShowPassword] = useState(false);
+        const isPassword = type === 'password';
+        const inputType = isPassword ? (showPassword ? 'text' : 'password') : type;
+
         return (
             <div className="w-full space-y-2 group/field">
                 {label && (
@@ -20,6 +25,7 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>(
                 <div className="relative group transition-all duration-300">
                     <input
                         ref={ref}
+                        type={inputType}
                         className={`
             w-full px-5 py-3.5 pr-12 rounded-2xl border bg-white dark:bg-slate-800 text-slate-900 dark:text-white transition-all duration-300
             focus:outline-none focus:ring-4 placeholder:text-slate-400 dark:placeholder:text-slate-500 placeholder:font-medium
@@ -35,8 +41,23 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>(
                         {...props}
                     />
 
+                    {/* Password Toggle Icon */}
+                    {isPassword && (
+                        <button
+                            type="button"
+                            onClick={() => setShowPassword(!showPassword)}
+                            className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 focus:outline-none transition-colors"
+                        >
+                            {showPassword ? (
+                                <EyeSlashIcon className="w-5 h-5" />
+                            ) : (
+                                <EyeIcon className="w-5 h-5" />
+                            )}
+                        </button>
+                    )}
+
                     {/* Success Icon */}
-                    {success && !error && (
+                    {success && !error && !isPassword && (
                         <div className="absolute right-4 top-1/2 -translate-y-1/2 animate-in fade-in zoom-in duration-300">
                             <CheckCircleIcon className="w-5 h-5 text-emerald-500" />
                         </div>

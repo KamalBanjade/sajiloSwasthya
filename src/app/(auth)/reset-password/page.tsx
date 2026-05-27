@@ -39,9 +39,10 @@ function ResetPasswordContent() {
   const {
     register,
     handleSubmit,
-    formState: { errors }
+    formState: { errors, isValid }
   } = useForm<PasswordFormData>({
-    resolver: zodResolver(passwordSchema)
+    resolver: zodResolver(passwordSchema),
+    mode: 'onChange'
   });
 
   const onSubmit = async (data: PasswordFormData) => {
@@ -146,7 +147,13 @@ function ResetPasswordContent() {
                 </div>
 
                 <div className="pt-4">
-                    <Button type="submit" variant="secondary" className="w-full h-14 text-sm font-bold shadow-lg shadow-secondary/20 hover:scale-[1.02] active:scale-95 transition-all" isLoading={isLoading}>
+                    <Button 
+                        type="submit" 
+                        variant="secondary" 
+                        className="w-full h-14 text-sm font-bold shadow-lg shadow-secondary/20 hover:scale-[1.02] active:scale-95 transition-all disabled:opacity-50 disabled:hover:scale-100" 
+                        isLoading={isLoading}
+                        disabled={!isValid || isLoading}
+                    >
                         {isLoading ? 'Updating...' : 'Update Password'}
                     </Button>
                 </div>
