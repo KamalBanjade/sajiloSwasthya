@@ -856,7 +856,7 @@ export default function StructuredRecordEntry() {
         toast.success(`Protocol "${newTemplateName}" saved to your library!`);
         setShowSaveTemplateModal(false);
         setNewTemplateName('');
-        router.push(`/doctor/patients/${patient?.id || 'dashboard'}`);
+        router.push('/doctor/appointments');
       }
     } catch {
       toast.error('Failed to save protocol');
@@ -895,7 +895,7 @@ export default function StructuredRecordEntry() {
     if (hasStructureChanges && !isDerivedSession) {
       setShowSaveTemplateModal(true);
     } else {
-      router.push(`/doctor/patients/${patient?.id || 'dashboard'}`);
+      router.push('/doctor/appointments');
     }
   };
 
@@ -1597,7 +1597,7 @@ export default function StructuredRecordEntry() {
                     Update Existing Protocol
                   </Button>
                 )}
-                <Button variant="ghost" className="w-full h-12 rounded-2xl font-black uppercase tracking-widest text-[10px] text-slate-400 hover:text-rose-500" onClick={() => { setShowSaveTemplateModal(false); if (lastSavedRecordId) router.push('/doctor/dashboard'); }}>
+                <Button variant="ghost" className="w-full h-12 rounded-2xl font-black uppercase tracking-widest text-[10px] text-slate-400 hover:text-rose-500" onClick={() => { setShowSaveTemplateModal(false); if (lastSavedRecordId) router.push('/doctor/appointments'); }}>
                   Don't Save
                 </Button>
               </div>
@@ -1609,7 +1609,7 @@ export default function StructuredRecordEntry() {
       {/* Follow-Up Scheduling Modal */}
       <FollowUpSchedulingModal
         isOpen={isFollowUpModalOpen}
-        onClose={() => setIsFollowUpModalOpen(false)}
+        onClose={() => handleFollowUpConfirm(null)}
         onConfirm={handleFollowUpConfirm}
         patientName={patient?.name || ''}
         todayAppointmentTime={todayAppointment?.appointmentDate ? formatLocalTime(todayAppointment.appointmentDate, 'HH:mm') : ''}

@@ -29,7 +29,7 @@ function getLocalIp() {
 }
 
 const localIp = getLocalIp();
-const apiUrl = process.env.NEXT_PUBLIC_API_URL ?? `https://sajilobackend-0r8o.onrender.com/api`;
+const apiUrl = process.env.NEXT_PUBLIC_API_URL ?? `http://localhost:5004/api`;
 const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? `http://${localIp}:3000`;
 const backendOrigin = apiUrl.replace(/\/api$/, "");
 
