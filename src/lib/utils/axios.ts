@@ -3,7 +3,7 @@ import axiosRetry from 'axios-retry';
 import Cookies from 'js-cookie';
 
 const isBrowser = typeof window !== 'undefined';
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5004/api';
+const API_URL = process.env.NEXT_PUBLIC_API_URL || 'https://sajilobackend-0r8o.onrender.com/api';
 
 const isProduction = process.env.NODE_ENV === 'production';
 

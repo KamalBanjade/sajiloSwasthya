@@ -63,7 +63,7 @@ class NotificationConnectionManager {
 
       const socketBase = isLocalHost
         ? `http://${window.location.hostname}:5004`
-        : (process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5004/api').replace(/\/api$/, '');
+        : (process.env.NEXT_PUBLIC_API_URL || 'https://sajilobackend-0r8o.onrender.com/api').replace(/\/api$/, '');
 
       this.connection = new signalR.HubConnectionBuilder()
         .withUrl(`${socketBase}/hubs/notifications`, {

@@ -44,7 +44,7 @@ export function PatientScanReceiver() {
 
     const socketBase = isLocalHost
       ? `http://${window.location.hostname}:5004`
-      : (process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5004/api').replace(/\/api$/, '');
+      : (process.env.NEXT_PUBLIC_API_URL || 'https://sajilobackend-0r8o.onrender.com/api').replace(/\/api$/, '');
 
     const hubConnection = new signalR.HubConnectionBuilder()
       .withUrl(`${socketBase}/hubs/scanner`, {
@@ -127,7 +127,7 @@ export function PatientScanReceiver() {
 
       const apiBase = isLocalHost
         ? '/api'
-        : (process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5004/api');
+        : (process.env.NEXT_PUBLIC_API_URL || 'https://sajilobackend-0r8o.onrender.com/api');
 
       const res = await fetch(`${apiBase}/scanner/verify-totp`, {
         method: 'POST',

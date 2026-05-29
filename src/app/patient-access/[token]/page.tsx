@@ -34,7 +34,7 @@ export default function PatientAccessPage({ params }: { params: Promise<{ token:
 
       // 2. We skip validation and just ping the API, the backend will validate the token
       // and immediately push the message to the Desktop via SignalR
-      const apiBase = process.env.NEXT_PUBLIC_API_URL || `http://localhost:5004/api`;
+      const apiBase = process.env.NEXT_PUBLIC_API_URL || `https://sajilobackend-0r8o.onrender.com/api`;
       
       const notifyRes = await fetch(`${apiBase}/scanner/notify-patient-scanned`, {
         method: 'POST',
