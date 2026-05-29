@@ -14,7 +14,7 @@ const getFetchBaseAndHeaders = () => {
 
     const apiBase = isLocalHost
         ? '/api'
-        : (process.env.NEXT_PUBLIC_API_URL || 'https://sajilobackend-0r8o.onrender.com/api');
+        : (process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5004/api');
 
     const headers: Record<string, string> = {
         'Content-Type': 'application/json',

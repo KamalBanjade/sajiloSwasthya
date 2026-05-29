@@ -44,7 +44,7 @@ export default function PairPage({ params }: { params: Promise<{ sessionId: stri
 
       const apiBase = isLocalHost
         ? `http://${window.location.hostname}:5004/api`
-        : (process.env.NEXT_PUBLIC_API_URL || 'https://sajilobackend-0r8o.onrender.com/api');
+        : (process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5004/api');
       
       const res = await fetch(`${apiBase}/scanner/pair`, {
         method: 'POST',

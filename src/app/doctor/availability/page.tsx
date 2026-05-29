@@ -32,6 +32,7 @@ import { useQueryClient } from '@tanstack/react-query';
 import { queryKeys } from '@/lib/queryKeys';
 import { AvailabilitySkeleton } from '@/components/doctor/AvailabilitySkeleton';
 import { PageLayout } from '@/components/layout/PageLayout';
+import { useConfirm } from '@/context/ConfirmContext';
 
 const DAYS = [
     { value: '0', label: 'Sunday' },
@@ -69,6 +70,8 @@ export default function AvailabilityPage() {
     const [blockEnd, setBlockEnd] = useState('');
     const [blockReason, setBlockReason] = useState('');
     const [isBlocking, setIsBlocking] = useState(false);
+
+    const { confirm } = useConfirm();
 
     const weeklyHours = schedule.filter(a => (a.recurrenceType === 1 || a.recurrenceType === 'Weekly'));
     const blockedTimes = schedule.filter(a => (a.recurrenceType === 0 || a.recurrenceType === 'OneTime') && !a.isAvailable);
@@ -139,10 +142,33 @@ export default function AvailabilityPage() {
 
         try {
             setIsBlocking(true);
+            
+            const conflictRes = await doctorAvailabilityApi.checkConflicts(
+                normalizeUTC(blockStart),
+                normalizeUTC(blockEnd)
+            );
+
+            let forceCancel = false;
+            if (conflictRes.success && conflictRes.data > 0) {
+                const confirmed = await confirm({
+                    title: 'Active Schedule Conflict',
+                    message: 'You have an active schedule, and if you add the absence the appointment will be cancelled. Do you want to proceed?',
+                    confirmText: 'Yes, Cancel Appointments',
+                    cancelText: 'No, Keep Availability',
+                    type: 'danger'
+                });
+                if (!confirmed) {
+                    setIsBlocking(false);
+                    return;
+                }
+                forceCancel = true;
+            }
+
             const res = await doctorAvailabilityApi.blockTime({
                 startDateTime: normalizeUTC(blockStart),
                 endDateTime: normalizeUTC(blockEnd),
-                reason: blockReason
+                reason: blockReason,
+                forceCancel
             });
 
             if (res.success) {
@@ -152,8 +178,9 @@ export default function AvailabilityPage() {
                 setBlockReason('');
                 queryClient.invalidateQueries({ queryKey: queryKeys.doctor.schedule(dateRange.start, dateRange.end) });
             }
-        } catch (error) {
-            toast.error('Absence registration failed');
+        } catch (error: any) {
+            const errorMsg = error?.response?.data?.message || 'Absence registration failed';
+            toast.error(errorMsg);
         } finally {
             setIsBlocking(false);
         }

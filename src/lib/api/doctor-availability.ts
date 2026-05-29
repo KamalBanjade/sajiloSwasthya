@@ -25,6 +25,7 @@ export interface BlockTimeRequest {
   startDateTime: string;
   endDateTime: string;
   reason: string;
+  forceCancel?: boolean;
 }
 
 export const doctorAvailabilityApi = {
@@ -37,6 +38,13 @@ export const doctorAvailabilityApi = {
 
   setWorkingHours: async (data: SetWorkingHoursRequest): Promise<ApiResponse<any>> => {
     const response = await axiosInstance.post('doctor/availability/working-hours', data);
+    return response.data;
+  },
+
+  checkConflicts: async (startDateTime: string, endDateTime: string): Promise<ApiResponse<number>> => {
+    const response = await axiosInstance.get('doctor/availability/check-conflicts', {
+      params: { startDateTime, endDateTime }
+    });
     return response.data;
   },
 
