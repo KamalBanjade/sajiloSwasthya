@@ -21,8 +21,7 @@ import { doctorApi, patientApi } from '@/lib/api';
 import { useAuthStore } from '@/store/authStore';
 import { Skeleton } from '@/components/ui/Skeleton';
 import {
-  AnalysisSummary, VitalTrend, MedicationCorrelation,
-  AbnormalityPattern, StabilityTimeline, QuarterlyStability
+  AnalysisSummary, VitalTrend, MedicationCorrelation
 } from '@/types/analysis';
 
 export interface LabMetadata {
@@ -258,7 +257,7 @@ function AnalysisSkeleton() {
 
 // ─── Main Component ───────────────────────────────────────────────────────────
 export function AnalysisDashboard({ patientId, patientFullName, overrideTotalVisits }: AnalysisDashboardProps) {
-  const [activeTab, setActiveTab] = useState<'vitals' | 'labs' | 'treatment' | 'history'>('vitals');
+  const [activeTab, setActiveTab] = useState<'vitals' | 'labs' | 'treatment'>('vitals');
   const [showAllLabs, setShowAllLabs] = useState(false);
   const [isGenerating, setIsGenerating] = useState(false);
 
@@ -287,8 +286,6 @@ export function AnalysisDashboard({ patientId, patientFullName, overrideTotalVis
   const summary = fullData?.summary as AnalysisSummary || null;
   const trends = fullData?.trends as VitalTrend[] || [];
   const correlations = fullData?.correlations as MedicationCorrelation[] || [];
-  const patterns = fullData?.patterns as AbnormalityPattern[] || [];
-  const timeline = fullData?.timeline as StabilityTimeline || null;
   const metadata = metaRes?.data as LabMetadata[] || [];
 
   const normalizeVital = useMemo(() => buildNormalizer(metadata), [metadata]);
@@ -403,7 +400,6 @@ export function AnalysisDashboard({ patientId, patientFullName, overrideTotalVis
           { id: 'vitals', label: 'Vital Signs', icon: Heart },
           { id: 'labs', label: 'Laboratory', icon: FlaskConical },
           { id: 'treatment', label: 'Treatment', icon: Pill },
-          { id: 'history', label: 'History', icon: History },
         ].map((tab) => (
           <button
             key={tab.id}
@@ -436,11 +432,6 @@ export function AnalysisDashboard({ patientId, patientFullName, overrideTotalVis
         {activeTab === 'treatment' && (
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-6">
             <TreatmentEffect correlations={correlations} normalizeVital={normalizeVital} />
-          </motion.div>
-        )}
-        {activeTab === 'history' && (
-          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-6">
-            <StabilityLifecycle timeline={timeline} patterns={patterns} />
           </motion.div>
         )}
       </div>
@@ -1131,69 +1122,4 @@ function MedicationImpactCard({ med, normalizeVital }: { med: MedicationCorrelat
   );
 }
 
-function StabilityLifecycle({ timeline, patterns }: { timeline: StabilityTimeline | null, patterns: AbnormalityPattern[] }) {
-  if (!timeline) return <EmptyState icon={History} title="Stability Timeline" description="Long-term health stability tracking requires at least two observation quarters." />;
 
-  return (
-    <div className="space-y-8">
-      {/* Quarterly Distribution */}
-      <GlassCard className="p-8">
-        <SectionLabel icon={Activity}>Stability Score Distribution</SectionLabel>
-        <div className="h-[280px] relative">
-          <ResponsiveContainer width="99%" height="100%">
-            <ComposedChart data={timeline.quarters} margin={{ top: 10, right: 10, left: 0, bottom: 10 }}>
-              <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="var(--border)" strokeOpacity={0.3} />
-              <XAxis dataKey="quarter" tick={{ fontSize: 11, fill: 'var(--muted)', fontWeight: 700 }} />
-              <YAxis domain={[0, 100]} tick={{ fontSize: 11, fill: 'var(--muted)', fontWeight: 700 }} />
-              <Tooltip contentStyle={tooltipStyle} />
-              <Bar dataKey="stabilityScore" radius={[10, 10, 0, 0]} maxBarSize={50}>
-                {timeline.quarters.map((q, i) => <Cell key={i} fill={getScoreColor(q.stabilityScore)} />)}
-              </Bar>
-              <Line type="monotone" dataKey="stabilityScore" stroke="var(--primary)" strokeWidth={3} dot={{ fill: 'var(--primary)', r: 6 }} />
-            </ComposedChart>
-          </ResponsiveContainer>
-        </div>
-      </GlassCard>
-
-      {/* Abnormality Streaks */}
-      <section className="space-y-4">
-        <SectionLabel icon={ShieldAlert}>Clinical Anomalies & Streaks</SectionLabel>
-        {patterns.length === 0 ? (
-          <div className="p-8 rounded-3xl bg-emerald-500/5 border border-emerald-500/10 flex items-center gap-4">
-            <CheckCircle className="text-emerald-500" size={24} />
-            <div>
-              <p className="text-sm font-black text-foreground">Zero Anomaly Streaks</p>
-              <p className="text-[11px] font-semibold text-muted">All physiological markers have remained within valid operational ranges across all visits.</p>
-            </div>
-          </div>
-        ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {patterns.map(p => (
-              <GlassCard key={p.vitalName} className="p-6" glowColor="bg-red-500/5">
-                <div className="flex justify-between items-center mb-4">
-                  <p className="text-[12px] font-black text-foreground uppercase tracking-widest">{p.vitalName}</p>
-                  <span className="px-3 py-1 bg-red-500/10 text-red-500 rounded-full text-[10px] font-black uppercase">
-                    {p.maxConsecutiveAbnormalVisits}x Streak
-                  </span>
-                </div>
-                <div className="space-y-4">
-                  {p.streaks.map((s, i) => (
-                    <div key={i} className="space-y-1.5">
-                       <div className="w-full h-2 bg-surface-2 rounded-full overflow-hidden">
-                         <div className="h-full bg-red-500" style={{ width: `${(s.consecutiveCount / 5) * 100}%` }} />
-                       </div>
-                       <p className="text-[10px] font-bold text-muted flex justify-between">
-                         <span>{new Date(s.from).toLocaleDateString()} — {new Date(s.to).toLocaleDateString()}</span>
-                         <span>{s.consecutiveCount} readings</span>
-                       </p>
-                    </div>
-                  ))}
-                </div>
-              </GlassCard>
-            ))}
-          </div>
-        )}
-      </section>
-    </div>
-  );
-}
