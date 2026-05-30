@@ -383,14 +383,21 @@ function AppointmentDetailsOverlay({ appointmentId, onClose }: { appointmentId: 
                                                     <p className="text-sm font-black text-slate-900 dark:text-white uppercase">{app.patientName}</p>
                                                 </div>
                                                 <div className="flex gap-8">
-                                                    <div>
-                                                        <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest">Age</p>
-                                                        <p className="text-sm font-black text-slate-900 dark:text-white">{app.patientAge} Years</p>
-                                                    </div>
-                                                    <div>
-                                                        <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest">Gender</p>
-                                                        <p className="text-sm font-black text-slate-900 dark:text-white uppercase">{app.patientGender}</p>
-                                                    </div>
+                                                    {app.patientAge > 0 && app.patientAge < 120 && (
+                                                        <div>
+                                                            <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest">Age</p>
+                                                            <p className="text-sm font-black text-slate-900 dark:text-white">{app.patientAge} Years</p>
+                                                        </div>
+                                                    )}
+                                                    {app.patientGender &&
+                                                     app.patientGender.trim() !== '' &&
+                                                     app.patientGender.trim().toLowerCase() !== 'unknown' &&
+                                                     app.patientGender.trim().toLowerCase() !== 'unspecified' && (
+                                                        <div>
+                                                            <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest">Gender</p>
+                                                            <p className="text-sm font-black text-slate-900 dark:text-white uppercase">{app.patientGender}</p>
+                                                        </div>
+                                                    )}
                                                 </div>
                                             </div>
                                         </div>

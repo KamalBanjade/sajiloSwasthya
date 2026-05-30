@@ -37,6 +37,11 @@ import { EmergencyIDCard } from '@/components/patient/EmergencyIDCard';
 import { patientApi, PatientProfileData } from '@/lib/api/patient';
 import { PageLayout } from '@/components/layout/PageLayout';
 
+const parseDate = (d: string) => {
+    if (!d) return new Date();
+    return new Date(d.endsWith('Z') ? d : d + 'Z');
+};
+
 export default function QRCodesPage() {
     const { confirm } = useConfirm();
     const { user } = useAuthStore();
@@ -155,7 +160,7 @@ export default function QRCodesPage() {
         toast.success("Link copied to clipboard!");
     };
 
-    const downloadQR = async (token: string, type: 'Normal' | 'Emergency') => {
+    const downloadQR = async (token: string, type: 'Normal' | 'Emergency' | 'EmergencyQR') => {
         if (type === 'Emergency') {
             const cardElement = document.getElementById('emergency-id-card-element');
             if (!cardElement) {
@@ -195,7 +200,7 @@ export default function QRCodesPage() {
             const url = canvas.toDataURL("image/png");
             const link = document.createElement("a");
             link.href = url;
-            link.download = `Sajilo-QR-${type}-${token.substring(0, 8)}.png`;
+            link.download = `Sajilo-QR-${type === 'EmergencyQR' ? 'Emergency' : type}-${token.substring(0, 8)}.png`;
             link.click();
         }
     };
@@ -346,7 +351,7 @@ export default function QRCodesPage() {
                                             <div className="space-y-1">
                                                 <p className="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest">Expires</p>
                                                 <p className="text-sm font-bold text-slate-700 dark:text-slate-300">
-                                                    {format(new Date(normalCode.expiresAt), 'MMM dd, yyyy • hh:mm a')}
+                                                    {format(parseDate(normalCode.expiresAt), 'MMM dd, yyyy • hh:mm a')}
                                                 </p>
                                             </div>
                                             <div className="space-y-1">
@@ -460,16 +465,19 @@ export default function QRCodesPage() {
                                             <div className="space-y-1">
                                                 <p className="text-[10px] font-black text-rose-400 dark:text-rose-500 uppercase tracking-widest">Expires</p>
                                                 <p className="text-sm font-bold text-slate-700 dark:text-slate-300">
-                                                    {format(new Date(emergencyCode.expiresAt), 'MMM dd, yyyy • hh:mm a')}
+                                                    {format(parseDate(emergencyCode.expiresAt), 'MMM dd, yyyy • hh:mm a')}
                                                 </p>
                                             </div>
                                             <div className="space-y-1">
                                                 <p className="text-[10px] font-black text-rose-400 dark:text-rose-500 uppercase tracking-widest">Safety Scan</p>
-                                                <p className="text-sm font-bold text-slate-700 dark:text-slate-300">{emergencyCode.lastAccessedAt ? format(new Date(emergencyCode.lastAccessedAt), 'MMM dd, yyyy • hh:mm a') : 'Never used'}</p>
+                                                <p className="text-sm font-bold text-slate-700 dark:text-slate-300">{emergencyCode.lastAccessedAt ? format(parseDate(emergencyCode.lastAccessedAt), 'MMM dd, yyyy • hh:mm a') : 'Never used'}</p>
                                             </div>
                                         </div>
 
                                         <div className="flex flex-wrap gap-2 pt-4">
+                                            <Button variant="outline" size="sm" onClick={() => downloadQR(emergencyCode.token, 'EmergencyQR')} className="rounded-xl border-rose-200 text-rose-700 hover:bg-rose-50">
+                                                <Download className="w-3.5 h-3.5 mr-1.5" /> Download PNG
+                                            </Button>
                                             <Button variant="outline" size="sm" onClick={() => downloadQR(emergencyCode.token, 'Emergency')} className="rounded-xl border-rose-200 text-rose-700 hover:bg-rose-50">
                                                 <Download className="w-3.5 h-3.5 mr-1.5" /> ID Card Size
                                             </Button>
@@ -565,14 +573,14 @@ export default function QRCodesPage() {
                                             </td>
                                             <td className="px-8 py-5 text-sm font-semibold text-slate-600 dark:text-slate-400">
                                                 <div className="flex flex-col">
-                                                    <span className="text-slate-900 dark:text-slate-200">{format(new Date(code.createdAt), 'MMM dd, yyyy')}</span>
-                                                    <span className="text-[10px] text-slate-400 font-bold uppercase tracking-tighter">{format(new Date(code.createdAt), 'hh:mm a')}</span>
+                                                    <span className="text-slate-900 dark:text-slate-200">{format(parseDate(code.createdAt), 'MMM dd, yyyy')}</span>
+                                                    <span className="text-[10px] text-slate-400 font-bold uppercase tracking-tighter">{format(parseDate(code.createdAt), 'hh:mm a')}</span>
                                                 </div>
                                             </td>
                                             <td className="px-8 py-5 text-sm font-semibold text-slate-600 dark:text-slate-400">
                                                 <div className="flex flex-col">
-                                                    <span className="text-slate-900 dark:text-slate-200">{format(new Date(code.expiresAt), 'MMM dd, yyyy')}</span>
-                                                    <span className="text-[10px] text-slate-400 font-bold uppercase tracking-tighter">{format(new Date(code.expiresAt), 'hh:mm a')}</span>
+                                                    <span className="text-slate-900 dark:text-slate-200">{format(parseDate(code.expiresAt), 'MMM dd, yyyy')}</span>
+                                                    <span className="text-[10px] text-slate-400 font-bold uppercase tracking-tighter">{format(parseDate(code.expiresAt), 'hh:mm a')}</span>
                                                 </div>
                                             </td>
                                             <td className="px-8 py-5">
@@ -724,6 +732,7 @@ export default function QRCodesPage() {
                         emergencyContactRelationship={patientProfile?.emergencyContactRelationship}
                         emergencyContactPhone={patientProfile?.emergencyContactPhone}
                         accessUrl={`${typeof window !== 'undefined' && window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1' ? window.location.origin : networkFrontendUrl || window.location.origin}/emergency/${emergencyCode.token}`}
+                        profilePicture={user.profilePictureUrl}
                     />
                 </div>
             )}

@@ -107,6 +107,13 @@ function SuggestionChip({
 
 // Manual SVG removed in favor of Lucide icons
 
+const getTodayString = () => {
+    const today = new Date();
+    const yyyy = today.getFullYear();
+    const mm = String(today.getMonth() + 1).padStart(2, '0');
+    const dd = String(today.getDate()).padStart(2, '0');
+    return `${yyyy}-${mm}-${dd}`;
+};
 
 export function RecordUpload({ onUploadSuccess, onRecordUploaded }: RecordUploadProps) {
     const queryClient = useQueryClient();
@@ -114,7 +121,7 @@ export function RecordUpload({ onUploadSuccess, onRecordUploaded }: RecordUpload
     const [filePreview, setFilePreview] = useState<string | null>(null);
     const [recordType, setRecordType] = useState<RecordType>(RecordType.LAB_REPORT);
     const [description, setDescription] = useState('');
-    const [recordDate, setRecordDate] = useState('');
+    const [recordDate, setRecordDate] = useState(getTodayString());
     const [tags, setTags] = useState<string[]>([]);
 
     // Smart suggestion state
@@ -227,7 +234,7 @@ export function RecordUpload({ onUploadSuccess, onRecordUploaded }: RecordUpload
         removeFile();
         setRecordType(RecordType.LAB_REPORT);
         setDescription('');
-        setRecordDate('');
+        setRecordDate(getTodayString());
         setTags([]);
         setSuccess(false);
         setError(null);
@@ -372,7 +379,7 @@ export function RecordUpload({ onUploadSuccess, onRecordUploaded }: RecordUpload
                     <div className="lg:col-span-6 h-full flex flex-col min-h-[400px]">
                         <div className="space-y-4 h-full flex flex-col">
                             <label className="text-[11px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-[0.2em] block px-1">
-                                Document Source
+                                Document Source <span className="text-rose-500">*</span>
                             </label>
                             <div
                                 className={`flex-1 border-2 border-dashed rounded-2xl sm:rounded-[3rem] p-6 sm:p-10 text-center transition-all duration-500 flex flex-col items-center justify-center
@@ -493,7 +500,7 @@ export function RecordUpload({ onUploadSuccess, onRecordUploaded }: RecordUpload
                             <div className="flex items-center justify-between px-2">
                                 <div className="space-y-1">
                                     <label className="text-[11px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-[0.2em] block">
-                                        Assign Reviewing Doctor
+                                        Assign Reviewing Doctor <span className="text-rose-500">*</span>
                                     </label>
                                     <p className="text-[9px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest">Select an expert for clinical review</p>
                                 </div>

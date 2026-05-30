@@ -294,7 +294,12 @@ function ProfileContent() {
                 <div className="flex-1 p-6 sm:p-8 grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-8 items-center border-y sm:border-y-0 lg:border-y-0 border-slate-50 dark:border-slate-800">
                     <div className="space-y-1">
                         <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest flex items-center gap-1.5"><Calendar size={12} className="text-indigo-500" /> Patient Age</p>
-                        <p className="text-base sm:text-lg font-black text-slate-800 dark:text-white">{calculateAge(patient.dateOfBirth)} Years</p>
+                        <p className="text-base sm:text-lg font-black text-slate-800 dark:text-white">
+                            {(() => {
+                                const age = calculateAge(patient.dateOfBirth);
+                                return (age > 0 && age < 120) ? `${age} Years` : 'N/A';
+                            })()}
+                        </p>
                     </div>
                     <div className="space-y-1">
                         <p className="text-[9px] font-black text-rose-500 uppercase tracking-widest flex items-center gap-1.5"><Droplets size={12} /> Blood Group</p>

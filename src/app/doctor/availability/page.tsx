@@ -1,6 +1,8 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef, useMemo } from 'react';
+import { createPortal } from 'react-dom';
+import { format, isBefore, startOfDay } from 'date-fns';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
 import { Select } from '@/components/ui/Select';
@@ -44,6 +46,209 @@ const DAYS = [
     { value: '6', label: 'Saturday' },
 ];
 
+const MONTH_NAMES = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+const DAY_NAMES = ['Su','Mo','Tu','We','Th','Fr','Sa'];
+
+function DateCalendarPicker({
+    value,
+    onChange,
+    minDate,
+}: {
+    value: string;
+    onChange: (date: string) => void;
+    minDate: string;
+}) {
+    const [isOpen, setIsOpen] = useState(false);
+    const triggerRef = useRef<HTMLButtonElement>(null);
+    const containerRef = useRef<HTMLDivElement>(null);
+    const [popupStyle, setPopupStyle] = useState<{ top: number; left: number }>(({ top: 0, left: 0 }));
+
+    const minDateObj = useMemo(
+        () => startOfDay(new Date((minDate || format(new Date(), 'yyyy-MM-dd')) + 'T00:00:00')),
+        [minDate]
+    );
+
+    const [viewYear, setViewYear] = useState(() => minDateObj.getFullYear());
+    const [viewMonth, setViewMonth] = useState(() => minDateObj.getMonth());
+
+    // Sync view to minDate when it changes (e.g. end picker after start changes)
+    useEffect(() => {
+        setViewYear(minDateObj.getFullYear());
+        setViewMonth(minDateObj.getMonth());
+    }, [minDate]);
+
+    // Close on outside click
+    useEffect(() => {
+        if (!isOpen) return;
+        const handler = (e: MouseEvent) => {
+            const target = e.target as Node;
+            if (triggerRef.current?.contains(target)) return;
+            if (containerRef.current?.contains(target)) return;
+            setIsOpen(false);
+        };
+        document.addEventListener('mousedown', handler);
+        return () => document.removeEventListener('mousedown', handler);
+    }, [isOpen]);
+
+    const handleOpen = () => {
+        if (triggerRef.current) {
+            const rect = triggerRef.current.getBoundingClientRect();
+            setPopupStyle({ top: rect.bottom + 6, left: rect.left });
+        }
+        setIsOpen(o => !o);
+    };
+
+    const firstDay = new Date(viewYear, viewMonth, 1).getDay();
+    const daysInMonth = new Date(viewYear, viewMonth + 1, 0).getDate();
+
+    const isAtMinMonth = viewYear === minDateObj.getFullYear() && viewMonth === minDateObj.getMonth();
+
+    const handlePrevMonth = () => {
+        if (isAtMinMonth) return;
+        if (viewMonth === 0) { setViewMonth(11); setViewYear(y => y - 1); }
+        else setViewMonth(m => m - 1);
+    };
+    const handleNextMonth = () => {
+        if (viewMonth === 11) { setViewMonth(0); setViewYear(y => y + 1); }
+        else setViewMonth(m => m + 1);
+    };
+
+    const todayStr = format(new Date(), 'yyyy-MM-dd');
+
+    const isPast = (day: number) => {
+        const d = `${viewYear}-${String(viewMonth + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+        return isBefore(startOfDay(new Date(d + 'T00:00:00')), minDateObj);
+    };
+
+    const handleSelect = (day: number) => {
+        if (isPast(day)) return;
+        const d = `${viewYear}-${String(viewMonth + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+        onChange(d);
+        setIsOpen(false);
+    };
+
+    const displayValue = value
+        ? format(new Date(value + 'T00:00:00'), 'MMM d, yyyy')
+        : 'Select date';
+
+    const popup = isOpen ? createPortal(
+        <div
+            ref={containerRef}
+            style={{ position: 'fixed', top: popupStyle.top, left: popupStyle.left, zIndex: 9999 }}
+            className="w-60 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-2xl shadow-2xl shadow-slate-300/30 dark:shadow-black/40 p-4"
+        >
+            {/* Month navigation */}
+            <div className="flex items-center justify-between mb-3">
+                <button
+                    type="button"
+                    onClick={handlePrevMonth}
+                    disabled={isAtMinMonth}
+                    className={`w-7 h-7 rounded-lg flex items-center justify-center text-base font-bold transition-colors
+                        ${isAtMinMonth
+                            ? 'text-slate-200 dark:text-slate-700 cursor-not-allowed'
+                            : 'text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800'}`}
+                >
+                    ‹
+                </button>
+                <span className="text-[10px] font-black text-slate-900 dark:text-white uppercase tracking-wider">
+                    {MONTH_NAMES[viewMonth]} {viewYear}
+                </span>
+                <button
+                    type="button"
+                    onClick={handleNextMonth}
+                    className="w-7 h-7 rounded-lg flex items-center justify-center text-base font-bold text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
+                >
+                    ›
+                </button>
+            </div>
+
+            {/* Day headers */}
+            <div className="grid grid-cols-7 mb-1">
+                {DAY_NAMES.map(d => (
+                    <div key={d} className="text-center text-[8px] font-black text-slate-400 uppercase py-1">{d}</div>
+                ))}
+            </div>
+
+            {/* Day grid */}
+            <div className="grid grid-cols-7 gap-y-0.5">
+                {Array.from({ length: firstDay }, (_, i) => <div key={`e-${i}`} />)}
+                {Array.from({ length: daysInMonth }, (_, i) => {
+                    const day = i + 1;
+                    const past = isPast(day);
+                    const dateStr = `${viewYear}-${String(viewMonth + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+                    const isSelected = value === dateStr;
+                    const isToday = dateStr === todayStr;
+                    return (
+                        <button
+                            key={day}
+                            type="button"
+                            disabled={past}
+                            onClick={() => handleSelect(day)}
+                            className={[
+                                'w-8 h-8 mx-auto flex items-center justify-center rounded-full text-[10px] font-black transition-all',
+                                past
+                                    ? 'text-slate-300 dark:text-slate-600 cursor-not-allowed'
+                                    : isSelected
+                                        ? 'bg-rose-500 text-white'
+                                        : isToday
+                                            ? 'ring-1 ring-rose-400 ring-offset-1 dark:ring-offset-slate-900 text-slate-800 dark:text-slate-100 hover:bg-rose-50 dark:hover:bg-rose-900/20'
+                                            : 'text-slate-700 dark:text-slate-300 hover:bg-rose-50 dark:hover:bg-rose-900/20 cursor-pointer',
+                            ].join(' ')}
+                        >
+                            {day}
+                        </button>
+                    );
+                })}
+            </div>
+
+            {/* Today shortcut */}
+            <div className="mt-2 pt-2 border-t border-slate-100 dark:border-slate-800">
+                <button
+                    type="button"
+                    onClick={() => {
+                        if (!isPast(new Date().getDate()) ||
+                            (viewYear === minDateObj.getFullYear() && viewMonth === minDateObj.getMonth())) {
+                            const today = new Date();
+                            const todayVal = format(today, 'yyyy-MM-dd');
+                            if (!isBefore(startOfDay(today), minDateObj)) {
+                                onChange(todayVal);
+                                setIsOpen(false);
+                            }
+                        }
+                    }}
+                    className="w-full text-center text-[9px] font-black text-slate-400 hover:text-rose-500 dark:hover:text-rose-400 uppercase tracking-widest transition-colors py-1"
+                >
+                    Today
+                </button>
+            </div>
+        </div>,
+        document.body
+    ) : null;
+
+    return (
+        <>
+            <div className="flex items-center gap-2 w-full">
+                <button
+                    ref={triggerRef}
+                    type="button"
+                    onClick={handleOpen}
+                    className="flex-1 bg-transparent text-slate-900 dark:text-white text-xs font-black outline-none border-none cursor-pointer text-left"
+                >
+                    {displayValue}
+                </button>
+                <button
+                    type="button"
+                    onClick={handleOpen}
+                    className="shrink-0 p-1 rounded-lg text-slate-400 hover:text-rose-500 dark:hover:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-900/20 transition-colors outline-none border-none cursor-pointer"
+                >
+                    <CalendarDays size={13} />
+                </button>
+            </div>
+            {popup}
+        </>
+    );
+}
+
 export default function AvailabilityPage() {
     const queryClient = useQueryClient();
     const [dateRange] = useState(() => {
@@ -65,9 +270,19 @@ export default function AvailabilityPage() {
     const [useBreak, setUseBreak] = useState(false);
     const [isSavingHours, setIsSavingHours] = useState(false);
 
+    const todayYmd = format(new Date(), 'yyyy-MM-dd');
+
     // Block Time Form
-    const [blockStart, setBlockStart] = useState('');
-    const [blockEnd, setBlockEnd] = useState('');
+    const [blockStartDate, setBlockStartDate] = useState(todayYmd);
+    const [blockStartHour, setBlockStartHour] = useState('09');
+    const [blockStartMin, setBlockStartMin] = useState('00');
+    const [blockStartAmPm, setBlockStartAmPm] = useState('AM');
+
+    const [blockEndDate, setBlockEndDate] = useState(todayYmd);
+    const [blockEndHour, setBlockEndHour] = useState('05');
+    const [blockEndMin, setBlockEndMin] = useState('00');
+    const [blockEndAmPm, setBlockEndAmPm] = useState('PM');
+
     const [blockReason, setBlockReason] = useState('');
     const [isBlocking, setIsBlocking] = useState(false);
 
@@ -135,8 +350,35 @@ export default function AvailabilityPage() {
     };
 
     const handleBlockTime = async () => {
-        if (!blockStart || !blockEnd || !blockReason) {
+        if (!blockStartDate || !blockEndDate || !blockReason) {
             toast.error('Missing absence details');
+            return;
+        }
+
+        const get24HourTime = (hourStr: string, minStr: string, amPm: string) => {
+            let h = parseInt(hourStr, 10);
+            if (amPm === 'PM' && h < 12) h += 12;
+            if (amPm === 'AM' && h === 12) h = 0;
+            return `${String(h).padStart(2, '0')}:${minStr}`;
+        };
+
+        const start24 = get24HourTime(blockStartHour, blockStartMin, blockStartAmPm);
+        const end24 = get24HourTime(blockEndHour, blockEndMin, blockEndAmPm);
+
+        const blockStartCombined = `${blockStartDate}T${start24}`;
+        const blockEndCombined = `${blockEndDate}T${end24}`;
+
+        const startDt = new Date(blockStartCombined);
+        const endDt = new Date(blockEndCombined);
+        const now = new Date();
+
+        if (isBefore(startDt, now)) {
+            toast.error('Start datetime cannot be in the past');
+            return;
+        }
+
+        if (isBefore(endDt, startDt) || endDt.getTime() === startDt.getTime()) {
+            toast.error('End datetime must be after start datetime');
             return;
         }
 
@@ -144,8 +386,8 @@ export default function AvailabilityPage() {
             setIsBlocking(true);
             
             const conflictRes = await doctorAvailabilityApi.checkConflicts(
-                normalizeUTC(blockStart),
-                normalizeUTC(blockEnd)
+                normalizeUTC(blockStartCombined),
+                normalizeUTC(blockEndCombined)
             );
 
             let forceCancel = false;
@@ -165,16 +407,22 @@ export default function AvailabilityPage() {
             }
 
             const res = await doctorAvailabilityApi.blockTime({
-                startDateTime: normalizeUTC(blockStart),
-                endDateTime: normalizeUTC(blockEnd),
+                startDateTime: normalizeUTC(blockStartCombined),
+                endDateTime: normalizeUTC(blockEndCombined),
                 reason: blockReason,
                 forceCancel
             });
 
             if (res.success) {
                 toast.success('Absence period registered');
-                setBlockStart('');
-                setBlockEnd('');
+                setBlockStartDate(todayYmd);
+                setBlockStartHour('09');
+                setBlockStartMin('00');
+                setBlockStartAmPm('AM');
+                setBlockEndDate(todayYmd);
+                setBlockEndHour('05');
+                setBlockEndMin('00');
+                setBlockEndAmPm('PM');
                 setBlockReason('');
                 queryClient.invalidateQueries({ queryKey: queryKeys.doctor.schedule(dateRange.start, dateRange.end) });
             }
@@ -341,18 +589,104 @@ export default function AvailabilityPage() {
                         desc="Block your clinical calendar"
                         accent="rose"
                     >
-                        <div className="space-y-5">
+                        <div className="space-y-7">
                             <div className="space-y-1.5">
                                 <label className="text-[9px] font-black text-slate-400 uppercase tracking-widest px-1">Start DateTime</label>
-                                <Input type="datetime-local" value={blockStart} onChange={e => setBlockStart(e.target.value)} className="rounded-xl h-11 text-[10px] font-black" />
+                                <div className="w-full bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-2xl p-4 flex items-center transition-all hover:border-slate-400 dark:hover:border-slate-600 focus-within:ring-4 focus-within:ring-rose-500/10 focus-within:border-rose-500">
+                                    <div className="flex-1 flex items-center min-w-0 pr-3">
+                                        <DateCalendarPicker
+                                            value={blockStartDate}
+                                            onChange={(date) => {
+                                                setBlockStartDate(date);
+                                                if (blockEndDate && date && blockEndDate < date) {
+                                                    setBlockEndDate(date);
+                                                }
+                                            }}
+                                            minDate={todayYmd}
+                                        />
+                                    </div>
+                                    <span className="text-slate-300 dark:text-slate-600 font-light px-2 shrink-0">|</span>
+                                    <div className="flex items-center space-x-1.5 pl-3 shrink-0">
+                                        <select 
+                                            value={blockStartHour} 
+                                            onChange={e => setBlockStartHour(e.target.value)} 
+                                            className="bg-transparent text-slate-900 dark:text-white text-xs font-black outline-none border-none cursor-pointer appearance-none pr-1"
+                                        >
+                                            {Array.from({ length: 12 }, (_, i) => String(i + 1).padStart(2, '0')).map(h => (
+                                                <option key={h} value={h} className="bg-white dark:bg-slate-800 text-slate-900 dark:text-white">{h}</option>
+                                            ))}
+                                        </select>
+                                        <span className="text-slate-400 dark:text-slate-500 font-bold">:</span>
+                                        <select 
+                                            value={blockStartMin} 
+                                            onChange={e => setBlockStartMin(e.target.value)} 
+                                            className="bg-transparent text-slate-900 dark:text-white text-xs font-black outline-none border-none cursor-pointer appearance-none pr-1"
+                                        >
+                                            {Array.from({ length: 60 }, (_, i) => String(i).padStart(2, '0')).map(m => (
+                                                <option key={m} value={m} className="bg-white dark:bg-slate-800 text-slate-900 dark:text-white">{m}</option>
+                                            ))}
+                                        </select>
+                                        <select 
+                                            value={blockStartAmPm} 
+                                            onChange={e => setBlockStartAmPm(e.target.value)} 
+                                            className="bg-slate-100 dark:bg-slate-700/50 text-slate-700 dark:text-slate-200 text-[10px] font-black uppercase px-2 py-1 rounded-lg outline-none border-none cursor-pointer"
+                                        >
+                                            <option value="AM" className="bg-white dark:bg-slate-800 text-slate-900 dark:text-white">AM</option>
+                                            <option value="PM" className="bg-white dark:bg-slate-800 text-slate-900 dark:text-white">PM</option>
+                                        </select>
+                                    </div>
+                                </div>
                             </div>
                             <div className="space-y-1.5">
                                 <label className="text-[9px] font-black text-slate-400 uppercase tracking-widest px-1">End DateTime</label>
-                                <Input type="datetime-local" value={blockEnd} onChange={e => setBlockEnd(e.target.value)} className="rounded-xl h-11 text-[10px] font-black" />
+                                <div className="w-full bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-2xl p-4 flex items-center transition-all hover:border-slate-400 dark:hover:border-slate-600 focus-within:ring-4 focus-within:ring-rose-500/10 focus-within:border-rose-500">
+                                    <div className="flex-1 flex items-center min-w-0 pr-3">
+                                        <DateCalendarPicker
+                                            value={blockEndDate}
+                                            onChange={setBlockEndDate}
+                                            minDate={blockStartDate || todayYmd}
+                                        />
+                                    </div>
+                                    <span className="text-slate-300 dark:text-slate-600 font-light px-2 shrink-0">|</span>
+                                    <div className="flex items-center space-x-1.5 pl-3 shrink-0">
+                                        <select 
+                                            value={blockEndHour} 
+                                            onChange={e => setBlockEndHour(e.target.value)} 
+                                            className="bg-transparent text-slate-900 dark:text-white text-xs font-black outline-none border-none cursor-pointer appearance-none pr-1"
+                                        >
+                                            {Array.from({ length: 12 }, (_, i) => String(i + 1).padStart(2, '0')).map(h => (
+                                                <option key={h} value={h} className="bg-white dark:bg-slate-800 text-slate-900 dark:text-white">{h}</option>
+                                            ))}
+                                        </select>
+                                        <span className="text-slate-400 dark:text-slate-500 font-bold">:</span>
+                                        <select 
+                                            value={blockEndMin} 
+                                            onChange={e => setBlockEndMin(e.target.value)} 
+                                            className="bg-transparent text-slate-900 dark:text-white text-xs font-black outline-none border-none cursor-pointer appearance-none pr-1"
+                                        >
+                                            {Array.from({ length: 60 }, (_, i) => String(i).padStart(2, '0')).map(m => (
+                                                <option key={m} value={m} className="bg-white dark:bg-slate-800 text-slate-900 dark:text-white">{m}</option>
+                                            ))}
+                                        </select>
+                                        <select 
+                                            value={blockEndAmPm} 
+                                            onChange={e => setBlockEndAmPm(e.target.value)} 
+                                            className="bg-slate-100 dark:bg-slate-700/50 text-slate-700 dark:text-slate-200 text-[10px] font-black uppercase px-2 py-1 rounded-lg outline-none border-none cursor-pointer"
+                                        >
+                                            <option value="AM" className="bg-white dark:bg-slate-800 text-slate-900 dark:text-white">AM</option>
+                                            <option value="PM" className="bg-white dark:bg-slate-800 text-slate-900 dark:text-white">PM</option>
+                                        </select>
+                                    </div>
+                                </div>
                             </div>
                             <div className="space-y-1.5">
                                 <label className="text-[9px] font-black text-slate-400 uppercase tracking-widest px-1">Reason / Note</label>
-                                <Input placeholder="e.g. Vacation, Conference..." value={blockReason} onChange={e => setBlockReason(e.target.value)} className="rounded-xl h-11 text-xs font-bold" />
+                                <textarea
+                                    placeholder="e.g. Vacation, Conference..."
+                                    value={blockReason}
+                                    onChange={e => setBlockReason(e.target.value)}
+                                    className="w-full px-5 py-4 rounded-2xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white text-xs font-bold transition-all duration-300 focus:outline-none focus:ring-4 focus:ring-rose-500/10 focus:border-rose-500 hover:border-slate-400 dark:hover:border-slate-600 resize-none h-20 placeholder:text-slate-400 dark:placeholder:text-slate-500"
+                                />
                             </div>
                             <Button
                                 onClick={handleBlockTime}

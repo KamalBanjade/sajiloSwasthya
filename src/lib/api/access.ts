@@ -83,8 +83,20 @@ export const accessApi = {
     },
 
     getEmergencyAccess: async (token: string): Promise<{ success: boolean; data: EmergencyAccessDTO }> => {
-        const response = await axiosInstance.get(`access/emergency/${token}`);
-        return response.data;
+        // Use a direct fetch call bypassing interceptors that attach authorization headers
+        const apiBase = process.env.NEXT_PUBLIC_API_URL || 'https://sajilobackend-0r8o.onrender.com/api';
+        const response = await fetch(`${apiBase}/access/emergency/${token}`, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        });
+        if (!response.ok) {
+            const errData = await response.json().catch(() => ({}));
+            throw { response: { data: errData } };
+        }
+        const data = await response.json();
+        return data;
     },
 
     getSessionRecords: async (): Promise<{ success: boolean; data: SessionStatusDTO }> => {

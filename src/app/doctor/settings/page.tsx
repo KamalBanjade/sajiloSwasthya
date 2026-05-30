@@ -168,26 +168,7 @@ export default function DoctorSettingsPage() {
                     >
                         <div className="space-y-8">
 
-                            {/* Two Factor Row */}
-                            <div className="flex flex-col md:flex-row md:items-center justify-between p-8 bg-slate-50 dark:bg-slate-800/40 rounded-[2.5rem] border border-slate-100 dark:border-white/5 gap-6">
-                                <div className="flex items-center gap-6">
-                                    <div className={`w-14 h-14 rounded-2xl flex items-center justify-center ${user?.twoFactorEnabled ? 'bg-emerald-500/10 text-emerald-500' : 'bg-amber-500/10 text-amber-500'}`}>
-                                        <Smartphone size={24} />
-                                    </div>
-                                    <div>
-                                        <p className="text-sm font-black text-slate-900 dark:text-white uppercase">Two-Factor Authentication</p>
-                                        <p className="text-xs font-bold text-slate-400 mt-1">{user?.twoFactorEnabled ? 'Your account is protected by an extra layer of security.' : 'Highly recommended to secure your medical data.'}</p>
-                                    </div>
-                                </div>
-                                <button
-                                    onClick={handleToggle2FA}
-                                    disabled={is2FASubmitting}
-                                    className={`h-11 px-8 rounded-xl text-[10px] font-black tracking-widest uppercase transition-all active:scale-95 flex items-center gap-2
-                                    ${user?.twoFactorEnabled ? 'bg-rose-500 text-white shadow-lg shadow-rose-500/20' : 'bg-secondary text-white shadow-lg shadow-secondary/20'}`}
-                                >
-                                    {is2FASubmitting ? <Loader2 size={14} className="animate-spin" /> : user?.twoFactorEnabled ? 'Disable 2FA' : 'Enable 2FA'}
-                                </button>
-                            </div>
+
 
                             {/* Password Change Row */}
                             <div className={`p-8 rounded-[2.5rem] border transition-all duration-500 ${isChangingPassword ? 'bg-white dark:bg-slate-900 border-indigo-500 shadow-xl' : 'bg-slate-50 dark:bg-slate-800/40 border-slate-100 dark:border-white/5'}`}>
