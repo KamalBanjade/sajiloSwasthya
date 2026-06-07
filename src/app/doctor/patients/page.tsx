@@ -102,6 +102,8 @@ function PatientsContent() {
                 if (aVal > bVal) return sortConfig.direction === 'asc' ? 1 : -1;
                 return 0;
             });
+        } else {
+            result = [...result].sort((a, b) => (b.sharedRecordsCount || 0) - (a.sharedRecordsCount || 0));
         }
         return result;
     }, [patients, searchQuery, sortConfig]); return (

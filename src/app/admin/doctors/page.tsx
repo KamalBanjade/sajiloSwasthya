@@ -66,7 +66,15 @@ export default function DoctorListPage() {
         isActive
     });
 
-    const doctors = doctorsData?.data || [];
+    const rawDoctors = doctorsData?.data || [];
+    const doctors = React.useMemo(() => {
+        return [...rawDoctors].sort((a: any, b: any) => {
+            if (a.isActive !== b.isActive) {
+                return a.isActive ? -1 : 1;
+            }
+            return (b.certificationCount || 0) - (a.certificationCount || 0);
+        });
+    }, [rawDoctors]);
     const totalCount = doctorsData?.pagination?.totalCount || 0;
     const totalPages = doctorsData?.pagination?.totalPages || 1;
 

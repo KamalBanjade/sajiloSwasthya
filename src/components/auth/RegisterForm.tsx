@@ -22,7 +22,19 @@ import {
   '@heroicons/react/24/outline';
 
 const registerSchema = z.object({
-  email: z.string().email('Invalid email address'),
+  email: z.string()
+    .email('Invalid email address')
+    .refine((val) => {
+      // Extract domain after '@'
+      const domain = val.split('@')[1]?.toLowerCase() ?? '';
+      // Regex matching known consumer / provider domains (full domain or parent domain)
+      const knownDomainRegex =
+        /^(gmail|googlemail|outlook|hotmail|live|msn|passport|yahoo|ymail|icloud|me|mac|protonmail|proton|pm|tutanota|tuta|zoho|zohomail|aol|aim|verizon|gmx|web|mail|fastmail|fastmail\.fm|hey|yandex|samsung|rediffmail)\.(com|net|de|fr|es|it|in|ca|ru|co\.uk|com\.au|io|me|fm)$/;
+      // Also accept subdomains of those domains (e.g. mail.yahoo.com)
+      const parts = domain.split('.');
+      const tldPlusOne = parts.length >= 2 ? parts.slice(-2).join('.') : domain;
+      return knownDomainRegex.test(domain) || knownDomainRegex.test(tldPlusOne);
+    }, 'Please use a recognised email provider (e.g. Gmail, Yahoo, Outlook, Apple, ProtonMail)'),
   password: z.string().
     min(8, 'Password must be at least 8 characters').
     regex(/[A-Z]/, 'Must contain at least one uppercase letter').
