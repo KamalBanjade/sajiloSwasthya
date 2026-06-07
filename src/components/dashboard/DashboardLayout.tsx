@@ -196,8 +196,8 @@ export const DashboardLayout = ({ children, role }: { children: React.ReactNode;
         { icon: UsersIcon, label: 'Patient Directory', desc: 'Global directory of registered patients', href: '/admin/patients', section: 'Management' },
         { icon: ClipboardDocumentListIcon, label: 'Audit Logs', desc: 'Immutable records of all system activities', href: '/admin/audit-logs', section: 'System' },
         { icon: ChartBarIcon, label: 'System Stats', desc: 'Real-time infrastructure and usage metrics', href: '/admin/statistics', section: 'System' },
-        { icon: CircleStackIcon, label: 'Backups', desc: 'Manage system backups and recovery points', href: '/admin/backups', section: 'System' },
-        { icon: LockClosedIcon, label: 'Security', desc: 'Global threat monitoring and policy control', href: '/admin/security', section: 'System' }
+        // { icon: CircleStackIcon, label: 'Backups', desc: 'Manage system backups and recovery points', href: '/admin/backups', section: 'System' },
+        // { icon: LockClosedIcon, label: 'Security', desc: 'Global threat monitoring and policy control', href: '/admin/security', section: 'System' }
     ];
 
 
